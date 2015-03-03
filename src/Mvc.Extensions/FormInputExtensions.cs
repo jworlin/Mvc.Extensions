@@ -207,7 +207,7 @@ namespace Mvc.Extensions
             builder.Append(string.Format("\n\t\t<select id=\"{0}\" name=\"{0}\" class=\"xlarge\">", id));
             if (string.IsNullOrWhiteSpace(value) || options.Where(x => x.Key == value).Count() == 0)
             {
-                builder.Append("<option>Select ...</option>");
+                builder.Append(@"<option value="">Select ...</option>");
             }
             foreach (var option in options)
             {
@@ -231,11 +231,11 @@ namespace Mvc.Extensions
             var value = field != null ? field.ToString() : "";
 
             var builder = new StringBuilder();
-            AppendFormStartOfInputWrappers(htmlHelper, builder, inputName, displayName);
+            AppendFormStartOfInputWrappers(htmlHelper, builder, id, displayName);
             builder.Append(string.Format("\n\t\t<select id=\"{0}\" name=\"{0}\" class=\"xlarge\">", id));
             if (string.IsNullOrWhiteSpace(value) || options.Where(x => x.Key == value).Count() == 0)
             {
-                builder.Append("<option>Select ...</option>");
+                builder.Append(@"<option value="">Select ...</option>");
             }
             for (int i = 0; i < options.Count(); i++)
             {                          
@@ -264,7 +264,7 @@ namespace Mvc.Extensions
             builder.Append(string.Format("\n\t\t<select id=\"{0}\" name=\"{0}\" class=\"xlarge\">", inputName));
             if (string.IsNullOrWhiteSpace(value) || options.Where(x => x.Key == value).Count() == 0)
             {
-                builder.Append("<option>Select ...</option>");                
+                builder.Append(@"<option value="">Select ...</option>");
             }
             foreach (var option in options)
             {
@@ -291,7 +291,7 @@ namespace Mvc.Extensions
             var allOptions = groupOfOptions.SelectMany(x => x.Items);
             if (string.IsNullOrWhiteSpace(value) || allOptions.Where(x => x.Key == value).Count() == 0)
             {
-                builder.Append("<option>Select ...</option>");
+                builder.Append(@"<option value="">Select ...</option>");
             }
             foreach (var group in groupOfOptions)
             {
@@ -386,7 +386,7 @@ namespace Mvc.Extensions
             builder.Append(string.Format("\n\t\t<select id=\"{0}\" name=\"{0}\" class=\"xlarge\">", selectId));
             if (string.IsNullOrWhiteSpace(value) || options.Where(x => x.Key == value).Count() == 0)
             {
-                builder.Append("<option>Select ...</option>");
+                builder.Append(@"<option value="">Select ...</option>");
             }
             foreach (var option in options)
             {
