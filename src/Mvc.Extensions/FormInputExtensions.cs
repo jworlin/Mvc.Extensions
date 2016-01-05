@@ -29,13 +29,32 @@ namespace Mvc.Extensions
             return htmlHelper.BuildInput(!field.Editable, type, "", name, "", action, null);
         }
 
+        static MvcHtmlString BuildEditableFieldWithGroups<T>(this HtmlHelper<T> htmlHelper, string name,
+                                                          Expression<Func<T, object>> action)
+        {
+            var field = action.Compile().Invoke(htmlHelper.ViewData.Model) as FieldWithGroupedOptions<string>;
+            if (!field.Viewable) return new MvcHtmlString("");
+
+            var type = GetTextBoxInputType(name);
+            if (field.Options.Count > 0)
+                return htmlHelper.BuildSelect(field.Options, name, "", action);
+            return htmlHelper.BuildInput(!field.Editable, type, "", name, "", action, null);
+        }
+
         public static MvcHtmlString BuildEditableField<T>(this HtmlHelper<T> htmlHelper,
                                                           Expression<Func<T, object>> action)
         {
             var name = htmlHelper.GetMemberName(action).FriendlyName();
+
+            return htmlHelper.BuildEditableField(name, action);
+        }
+
+        public static MvcHtmlString BuildEditableField<T>(this HtmlHelper<T> htmlHelper, string name,
+                                                          Expression<Func<T, object>> action)
+        {            
             var field = action.Compile().Invoke(htmlHelper.ViewData.Model) as Field<string>;
             if (field == null)
-                return htmlHelper.BuildEditableFieldWithGroups(action);
+                return htmlHelper.BuildEditableFieldWithGroups(name, action);
             if (!field.Viewable) return new MvcHtmlString("");
 
             var type = GetTextBoxInputType(name);
@@ -124,6 +143,34 @@ namespace Mvc.Extensions
             builder.Append(string.Format("\n\t\t<span class=\"help-inline\">{0}</span>", htmlHelper.GetErrorOrDisplayHelp(inputName, helpText)));
             AppendFormEndOfInputWrappers(builder);
             return new MvcHtmlString(builder.ToString());
+        }
+
+        public static MvcHtmlString BuildTextArea<T>(this HtmlHelper<T> htmlHelper, string displayName, string helpText, string classesString, int cols, int rows, object htmlAttributes, Expression<Func<T, object>> action)
+        {
+            var expression = GetMemberInfo(action);
+            var field = action.Compile().Invoke(htmlHelper.ViewData.Model);
+            var inputName = expression.Member.Name;
+            var value = field != null ? field.ToString() : "";
+            var builder = new StringBuilder();
+            AppendFormStartOfInputWrappers(htmlHelper, builder, inputName, displayName);
+            builder.Append(
+                string.Format(
+                    "\n\t\t<textarea cols=\"{0}\" rows=\"{1}\"class=\"xlarge {2}\" name=\"{3}\" id=\"{3}\" {5}>{4}</textarea>",
+                    cols, rows, classesString, inputName, value, FormatAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes))));
+            builder.Append(string.Format("\n\t\t<span class=\"help-inline\">{0}</span>", htmlHelper.GetErrorOrDisplayHelp(inputName, helpText)));
+            AppendFormEndOfInputWrappers(builder);
+            return new MvcHtmlString(builder.ToString());
+        }
+
+        static string FormatAttributes(IEnumerable<KeyValuePair<string, object>> htmlAttributes)
+        {
+            var sb = new StringBuilder();
+            foreach (var keyValuePair in htmlAttributes)
+            {
+                sb.Append(string.Format("{0}=\"{1}\" ", keyValuePair.Key, keyValuePair.Value));
+            }
+
+            return sb.ToString();
         }
 
         public static MvcHtmlString BuildTextArea<T>(this HtmlHelper<T> htmlHelper, string displayName, string id, string helpText, string classesString, int cols, int rows, Expression<Func<T, object>> action)
